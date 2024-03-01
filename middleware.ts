@@ -1,8 +1,9 @@
-export default {
-    providers: [
-      {
-        domain: "https://your-issuer-url.clerk.accounts.dev/",
-        applicationID: "convex",
-      },
-    ]
-  };
+import { authMiddleware } from "@clerk/nextjs";
+
+export default authMiddleware({
+  publicRoutes: ["/"],
+});
+
+export const config = {
+  matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
+};
