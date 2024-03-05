@@ -5,12 +5,24 @@ import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
 import { CacheBackedEmbeddings } from "langchain/embeddings/cache_backed";
+import { ChainValues } from 'langchain/dist/schema';
+import { LLMChain, loadQARefineChain } from 'langchain/chains';
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { ConvexKVStore } from "langchain/storage/convex";
 import { ConvexVectorStore } from "langchain/vectorstores/convex";
+import { BaseLanguageModel } from 'langchain/dist/base_language';
+import { Document } from 'langchain/document';
+import { PromptTemplate } from 'langchain/prompts';
+import { jsonClassification ,jsonAnalysis,jsonOneShotExtraction,jsonZeroShotSchemaExtractionTemplate,jsonZeroShotSchemaExtractionRefine} from "../constants/prompts";
 import { internal } from "../_generated/api";
 import { action, internalAction } from "../_generated/server";
+import { Schema } from "zod";
 
+const OPENAI_MODEL = "gpt-3.5-turbo";
+const sampleTemplate = new PromptTemplate({
+  template:'{pageDescription} in the style of a children book ilustration',
+  inputVariables: ["pageDescription"],
+});
 //data ingestion
 export const ingest = action({
   args:{},
@@ -42,5 +54,32 @@ export const fetchAndEmbedSingle = internalAction({
   });
 
   //generate output
+function extract(){
+
+}
 
   //generate refine output
+
+
+ async function generateOutput(chainValues: ChainValues): Promise<ChainValues> {
+  const llmModel = new ChatOpenAI({
+    cache: true,
+    maxConcurrency: 10,
+    maxRetries:3,
+    modelName: OPENAI_MODEL,
+    openAIApiKey: process.env.OPENAI_API_KEY,
+    temperature: 0,
+  });
+
+  const llmChain = new LLMChain({
+    llm:llmModel,
+    prompt:jsonAnalysis,
+  });
+
+  try{
+    const output = llmChain.call(chainValues);
+    return {output};
+  } catch(e){
+    throw e;
+  }
+ }
