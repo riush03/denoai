@@ -1,5 +1,6 @@
 "use client";
 
+import { SignOutButton, UserButton,UserProfile,useUser } from "@clerk/nextjs";
 import { cn } from "@/lib/utils";
 import { Icons } from "./Icons";
 import { NavItem } from "./NavSection";
@@ -8,13 +9,12 @@ import { usePathname } from "next/navigation";
 
 export function BottomSection({
   className,
-  username,
   items,
 }: {
   className?: string;
-  username: string;
   items: NavItem[];
 }) {
+  const { isLoaded ,user } = useUser();
   const path = usePathname();
   return (
     <div className={className}>
@@ -63,18 +63,17 @@ export function BottomSection({
       >
         <div className="rounded-full bg-slate-900 h-10 w-10 flex flex-none items-center justify-center">
           <span className="text-slate-100 font-bold">
-            {`${username.slice(0, 1).toUpperCase()}${username.slice(1, 2)}`}
+            <UserButton/>
           </span>
         </div>
         <span className="ml-2 text-slate-800 text-ellipsis overflow-hidden">
-          {username}
+          {user?.firstName }
         </span>
         <div
-          onClick={() => {
-            
-          }}
+          
           className="ml-auto p-2 hover:cursor-pointer hover:bg-slate-100 hover:rounded"
         >
+          <SignOutButton/>
           <Icons.logout className="h-5 w-5 text-slate-800 hover:text-slate-600" />
         </div>
       </div>

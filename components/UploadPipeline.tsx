@@ -7,7 +7,7 @@ import { Switch } from "./ui/switch";
 import { Label } from "@radix-ui/react-label";
 import { HelpTooltip } from "./ui/help-tooltip";
 import Balancer from "react-wrap-balancer";
-import Dropzone from "./Dropzone";
+import {Dropzone } from "./Dropzone";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";

@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 function HeroSection() {
   const router = useRouter();
   const handleRegisterNavigation = () => {
-    router.push("/register");
+    router.push("/dashboard");
   };
   return (
     <section className="flex flex-col gap-8 md:flex-row justify-between">

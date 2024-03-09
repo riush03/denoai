@@ -1,5 +1,5 @@
 "use client";
-import MultiStep from "./Multisteps";
+import MultiStep from "./multi-steps";
 
 import Link from "next/link";
 import { cn } from "../lib/utils";
@@ -9,7 +9,7 @@ import { headers } from "next/headers";
 import dynamic from "next/dynamic";
 import { Textarea } from "./ui/textarea";
 import { useState } from "react";
-import { Icons } from "./Icons";
+import { Icons } from "./icons";
 import Balancer from "react-wrap-balancer";
 import { useRouter } from "next/navigation";
 
