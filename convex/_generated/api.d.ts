@@ -14,6 +14,13 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as clerk from "../clerk.js";
+import type * as constants_prompts from "../constants/prompts.js";
+import type * as files from "../files.js";
+import type * as http from "../http.js";
+import type * as langchain_db from "../langchain/db.js";
+import type * as lib_myllm from "../lib/myllm.js";
+import type * as users from "../users.js";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -23,7 +30,15 @@ import type {
  * const myFunctionReference = api.myModule.myFunction;
  * ```
  */
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  clerk: typeof clerk;
+  "constants/prompts": typeof constants_prompts;
+  files: typeof files;
+  http: typeof http;
+  "langchain/db": typeof langchain_db;
+  "lib/myllm": typeof lib_myllm;
+  users: typeof users;
+}>;
 export declare const api: FilterApi<
   typeof fullApi,
   FunctionReference<any, "public">

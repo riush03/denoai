@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Icons } from "./Icons";
 import MultiStep from "./Multisteps";
 import { useEffect } from "react";
+import { FileUploadDialog } from "./UploadDialog";
 import { useStepStore } from "@/lib/store";
 
 export function TopMainContent({
@@ -34,20 +35,7 @@ export function TopMainContent({
       </h1>
       {step !== undefined && <MultiStep />}
       {displayUploadButton && (
-        <Link
-          className={cn(
-            buttonVariants(),
-            "mb-4 mr-4 absolute right-0 bottom-0"
-          )}
-          href={"/upload"}
-        >
-          <Icons.upload
-            width={18}
-            height={18}
-            className="mr-2 stroke-slate-100"
-          />
-          Upload Files
-        </Link>
+        <FileUploadDialog/>
       )}
     </div>
   );

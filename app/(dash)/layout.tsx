@@ -1,12 +1,7 @@
-
-import { BottomSection } from "@/components/BottomSection";
-import { NavItem, NavSection, NavSectionItems } from "@/components/NavSection";
-import Image from "next/image";
-import Link from "next/link";
-
-interface DashboardLayoutProps {
-  children: React.ReactNode;
-}
+import { SideNav } from "@/components/Siderbar";
+import Header from "@/components/Navbar";
+import { NavSection } from "@/components/NavSection";
+import { NavSectionItems } from "@/components/NavSection";
 
 const pipelines: NavSectionItems = {
   label: "Pipelines",
@@ -52,54 +47,27 @@ const organizedData: NavSectionItems = {
   ],
 };
 
-const bottomItems: NavItem[] = [
-  {
-    label: "Help",
-    href: "/help",
-    icon: "help",
-  },
-  {
-    label: "Settings",
-    href: "/settings",
-    icon: "settings",
-  },
-];
-
-export default async function DashboardLayout({
+export default function DashboardLayout({
   children,
-}: DashboardLayoutProps) {
-  
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
-    <div className="min-h-screen flex">
-      {/* /* Sidenav */}
-      <div className="fixed inset-y-0 z-50 flex w-72 flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto border-r-2 border-slate-200 bg-white pl-8 pr-6 pb-4">
-          {/* Logo */}
-          <Link href="/dashboard">
-            <Image
-              className="flex mt-8 shrink-0"
-              priority
-              src="/logo.png"
-              width={102}
-              height={38}
-              alt="Organize Simple Logo"
-            />
-          </Link>
-          {/* Navigation */}
-          <nav className="flex flex-1 flex-col">
-            <NavSection className="mt-20" section={pipelines} />
-            <NavSection className="mt-10" section={organizedData} />
-            <div className="flex flex-1 flex-col gap-y-7">
-            <BottomSection
-                className="mt-auto"
-                items={bottomItems}
-              />
-            </div>
-          </nav>
+    <main>
+       <aside className="w-full gap-8">
+          <Header />
+        </aside>
+      <div className="flex gap-8">
+        
+      <div className="flex flex-1 flex-col gap-8">
+        <NavSection className="mt-20" section={pipelines} />
+        <NavSection className="mt-10" section={organizedData} />
+        <SideNav/>
+      </div>
+        <div className="w-full">
+             {children}
         </div>
       </div>
-      {/* Main */}
-      <main className="pl-72 w-full">{children}</main>
-    </div>
+    </main>
   );
 }

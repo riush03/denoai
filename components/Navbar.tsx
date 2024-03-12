@@ -27,20 +27,16 @@ const Header = () => {
       <div className="flex h-[47px] items-center justify-between px-6 space-y-2 ">
         <div className="flex items-center space-x-4">
         <Link href="/" className="flex gap-2 items-center text-xl text-black">
-          <Image src="/logo.png" width="50" height="50" alt="file drive logo" />
-          FileDrive
+          <Image src="/images/biccas_logo.png" width="100" height="50" alt="file drive logo" />
         </Link>
         </div>
 
   
 
-        <div className="hidden  md:block">
+        <div className="flex gap-2 ">
+          <OrganizationSwitcher />
           <UserButton />
-          <SignedOut>
-            <SignInButton>
-              <Button onClick={() => {router.push('/dashboard')}}>Sign In</Button>
-            </SignInButton>
-          </SignedOut>
+          
         </div>
       </div>
     </div>

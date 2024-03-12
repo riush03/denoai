@@ -29,6 +29,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
+import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
+import { useQuery } from "convex/react";
 import { MoreHorizontal, RefreshCw, Trash } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";

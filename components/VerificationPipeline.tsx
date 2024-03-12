@@ -13,51 +13,8 @@ import { ObjectViewer } from "./ObjectViewer";
 import { motion } from "framer-motion";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-export default function VerificationPipeline({
-  uuid,
-  url,
-  text,
-  category,
-  json,
-}: {
-  uuid: string;
-  url: string;
-  text: string;
-  category: string;
-  json: any;
-}) {
-  async function sendJson(json: any) {
-    const res = await fetch("/api/verification", {
-      method: "POST",
-      body: JSON.stringify({
-        uuid,
-        json: JSON.stringify(verifiedJson),
-      }),
-    });
-    const data = await res.json();
-    if (res.status !== 200) {
-      throw new Error(data.message);
-    }
-  }
-  async function analyze() {
-    const res = await fetch("/api/analysis", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        text,
-        category,
-        json: JSON.stringify(verifiedJson),
-      }),
-    });
-    if (!res.ok) {
-      throw new Error("An error occurred while analyzing the JSON object");
-    }
-
-    const data = await res.json();
-    return data;
-  }
+export default function VerificationPipeline() {
+ 
 
   const [isAnalyzing, setisAnalyzing] = useState(false);
   const [isUpdating, setUpdating] = useState(false);
@@ -67,7 +24,7 @@ export default function VerificationPipeline({
     corrections: any[];
     textAnalysis: string;
   } | null>(null);
-  const [verifiedJson, setVerifiedJson] = useState(JSON.parse(json));
+
   return (
     <div className="mb-4 mx-4 flex flex-col flex-grow">
       <div className="flex flex-1 justify-center">
@@ -107,7 +64,7 @@ export default function VerificationPipeline({
                 className="p-2 w-full h-full bg-slate-900 rounded-lg"
               >
                 <object
-                  data={`${url}#toolbar=1&navpanes=0&statusbar=0&scrollbar=1&view=fitH`}
+                  data={`#toolbar=1&navpanes=0&statusbar=0&scrollbar=1&view=fitH`}
                   type="application/pdf"
                   className="w-full h-full rounded-md"
                 />
@@ -122,7 +79,7 @@ export default function VerificationPipeline({
                   }}
                   className="w-full text-xs text-slate-700 whitespace-break-spaces overflow-auto"
                 >
-                  {text}
+                  Some text here
                 </div>
               </TabsContent>
             </Tabs>
@@ -169,12 +126,7 @@ export default function VerificationPipeline({
                 )}
               </div>
               <div className="border border-slate-200 p-3 overflow-hidden rounded-lg w-full h-full">
-                <ObjectViewer
-                  category={category}
-                  json={verifiedJson}
-                  setVerifiedJson={setVerifiedJson}
-                  corrections={analysisResult?.corrections ?? []}
-                />
+                {/* {ObjectViewer Section} */}
               </div>
               <div className="flex justify-end gap-2 items-center absolute -bottom-12 right-0">
                 <Link
@@ -189,21 +141,8 @@ export default function VerificationPipeline({
                 </Link>
                 {analysisResult === null && (
                   <Button
-                    disabled={isAnalyzing}
                     variant={"secondary"}
                     className="relative inline-flex w-40 overflow-hidden bg-slate-100 p-[1.5px] group"
-                    onClick={() => {
-                      setisAnalyzing(true);
-                      analyze()
-                        .then((data) => {
-                          setAnalysisResult(data);
-                          setisAnalyzing(false);
-                        })
-                        .catch((err) => {
-                          console.error(err);
-                          setisAnalyzing(false);
-                        });
-                    }}
                   >
                     <span className="absolute inset-[-1000%] group-hover:animate-[spin_2s_linear_infinite] bg-slate-100" />
                     <span className="inline-flex h-full w-full items-center rounded justify-center bg-slate-100 px-3 py-1 backdrop-blur-3xl">
@@ -225,22 +164,7 @@ export default function VerificationPipeline({
                   </Button>
                 )}
                 <Button
-                  disabled={isAnalyzing || isUpdating}
                   className="w-40"
-                  onClick={() => {
-                    setUpdating(true);
-                    setErrorMsg("");
-                    sendJson(json)
-                      .then(() => {
-                        setIsProcessed(true);
-                        useStepStore.setState({ status: "complete" });
-                        setUpdating(false);
-                      })
-                      .catch(() => {
-                        setErrorMsg("Something went wrong, please try again");
-                        setUpdating(false);
-                      });
-                  }}
                 >
                   {isUpdating && (
                     <Icons.spinner

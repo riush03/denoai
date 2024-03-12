@@ -7,7 +7,7 @@ import { Switch } from "./ui/switch";
 import { Label } from "@radix-ui/react-label";
 import { HelpTooltip } from "./ui/help-tooltip";
 import Balancer from "react-wrap-balancer";
-import {Dropzone } from "./Dropzone";
+import { Dropzone } from "./Dropzone";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
@@ -29,7 +29,7 @@ export default function UploadPipeline() {
     <div className="flex flex-col mx-4 flex-grow -mt-24 2xl:-mt-64">
       <div className="flex flex-col flex-1 items-center justify-center">
         {status === "active" && (
-          <Dropzone  className="mt-4 mb-8" />
+          <Dropzone updateUploadInfos={setUploadInfos} className="mt-4 mb-8" />
         )}
         {status === "complete" && (
           <>
@@ -38,9 +38,9 @@ export default function UploadPipeline() {
               className="text-green-500 w-32 h-32 my-6"
             />
             <p className="text-center text-slate-500 mb-6">
-              Your file{3 > 1 && "s"} have been
+              Your file{uploadInfos?.success.length > 1 && "s"} have been
               uploaded successfully {uploadInfos?.success[0]}
-              {2 > 1 && " and will be processed shortly"}
+              {uploadInfos?.nbFiles > 1 && " and will be processed shortly"}
             </p>
             {(uploadInfos?.nbFiles === 1 && (
               <div className="flex gap-4">

@@ -21,7 +21,8 @@ export default async function DashboardPage() {
 
     return (
     <>
-      <div className="m-8 flex flex-col flex-grow items-center justify-center space-y-12 2xl:space-y-20">
+      <div className="h-full">
+    
       <TopMainContent title="Dashboard" displayUploadButton />
         <DataTable
           title="Documents in Pipelines"

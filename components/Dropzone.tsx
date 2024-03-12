@@ -1,3 +1,5 @@
+"use client"
+
 import { cn, formatBytes } from "@/lib/utils";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
@@ -7,6 +9,9 @@ import { useCallback, useState } from "react";
 import { FileRejection, useDropzone } from "react-dropzone";
 import { Icons } from "./Icons";
 import { Button } from "./ui/button";
+import { useMutation } from "convex/react";
+import { useOrganization, useUser } from "@clerk/nextjs";
+import { api } from "../convex/_generated/api";
 import { UploadInfo } from "./UploadPipeline";
 import { useStepStore } from "@/lib/store";
 
@@ -23,23 +28,30 @@ type SettledResult = {
 
 export function Dropzone({
   className,
+  updateUploadInfos,
 }: {
   className?: string;
-  
+  updateUploadInfos: (uploadInfos: UploadInfo) => void;
 }) {
   const [isBulkProcessing, setBulkProcessing] = useState(true);
   const [files, setFiles] = useState<File[]>([]);
   const [rejected, setRejected] = useState<FileRejection[]>([]);
   const [isUploading, setUploading] = useState(false);
   const [hasUploadFailed, setUploadFailed] = useState(false);
+  const user = useUser();
+  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   async function uploadFile(file: File) {
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch("/api/upload", {
+
+    const documentUrl = await generateUploadUrl();
+
+    const res = await fetch(documentUrl, {
       method: "POST",
       body: formData,
     });
+
     const data = await res.json();
 
     if (res.status !== 201) {
@@ -48,12 +60,60 @@ export function Dropzone({
     return data;
   }
 
+  async function uploadFiles(files: File[]) {
+    setUploadFailed(false);
+    setUploading(true);
+    const results = await Promise.allSettled([
+      ...files.map(uploadFile),
+      new Promise((resolve) => setTimeout(resolve, 700)),
+    ]);
+    const success = results.filter(
+      (result) => result.status === "fulfilled"
+    ) as SettledResult[];
+    const failed = results.filter(
+      (result) => result.status === "rejected"
+    ) as SettledResult[];
+    setUploading(false);
+    updateUploadInfos({
+      nbFiles: files.length,
+      success: success
+        .filter((result) => result.value)
+        .map((result) => [
+          result.value!.message.filename,
+          result.value!.message.id,
+        ]),
+      failed: files
+        .filter(
+          (file) =>
+            success.find(
+              (result) => result.value?.message.filename === file.name
+            ) === undefined
+        )
+        .map((file) => file.name),
+    });
 
+    if (failed.length) {
+      setUploadFailed(true);
+    } else {
+      useStepStore.setState({ status: "complete" });
+    }
+  }
+
+  const onDrop = useCallback(
+    (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
+      if (acceptedFiles.length) {
+        setFiles(acceptedFiles);
+      }
+      setRejected(rejectedFiles);
+    },
+    []
+  );
    
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "application/octet-stream": [".pdf"],
+      "text/csv": [".csv"],
     },
     maxFiles: isBulkProcessing ? 10 : 1,
     multiple: isBulkProcessing,
@@ -62,10 +122,9 @@ export function Dropzone({
 
   return (
     <div className={cn(className, "flex flex-col items-center justify-center")}>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <Switch
           id="bulk-processing"
-          disabled
           onCheckedChange={() =>
             setBulkProcessing((previousState) => !previousState)
           }

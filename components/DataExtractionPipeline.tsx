@@ -7,15 +7,7 @@ import { ExtractionStep } from "./ExtractionStep";
 import { SparkleIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function DataExtractionPipeline({
-  data,
-}: {
-  data: {
-    uuid: string;
-    filename: string;
-    text: string;
-  };
-}) {
+export default function DataExtractionPipeline() {
   const categories = [
     {
       value: "receipts",
@@ -40,7 +32,7 @@ export default function DataExtractionPipeline({
     }
   }, [category]);
   return (
-    <div className="flex flex-col flex-grow items-center justify-center mx-4">
+    <div className="flex flex-col flex-grow items-center justify-center mx-4  gap-x-10">
       <SparkleIcon
         className={cn(
           llmCall ? "opacity-100" : "opacity-0",
@@ -51,12 +43,12 @@ export default function DataExtractionPipeline({
         setLlmCall={setLlmCall}
         categories={categories}
         updateCategory={setCategory}
-        text={data.text}
+        text={"text here"}
       />
       {step === 2 && (
         <ExtractionStep
-          uuid={data.uuid}
-          text={data.text}
+          uuid={"466374383"}
+          text={"text here"}
           setLlmCall={setLlmCall}
           category={categories.find((c) => c.value === category)! ?? "receipts"}
         />
