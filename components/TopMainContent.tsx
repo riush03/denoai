@@ -1,4 +1,7 @@
 "use client";
+
+import { useOrganization, useUser } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -17,6 +20,16 @@ export function TopMainContent({
   displayUploadButton?: boolean;
   step?: number;
 }) {
+  const organization = useOrganization();
+  const user = useUser();
+
+  
+  let orgId: string | undefined = undefined;
+  if (organization.isLoaded && user.isLoaded) {
+    orgId = organization.organization?.id ?? user.user?.id;
+  }
+
+
   useEffect(() => {
     useStepStore.setState(() => ({
       current: step ?? 0,

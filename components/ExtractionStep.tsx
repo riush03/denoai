@@ -2,10 +2,20 @@ import Balancer from "react-wrap-balancer";
 import { cn } from "@/lib/utils";
 import { Icons } from "./Icons";
 import Link from "next/link";
+import { useOrganization, useUser } from "@clerk/nextjs";
 import { Button, buttonVariants } from "./ui/button";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+
+enum Status {
+  TO_RECOGNIZE,
+  TO_EXTRACT,
+  TO_VERIFY,
+}
+
 
 export function ExtractionStep({
   text,
@@ -25,6 +35,15 @@ export function ExtractionStep({
   const [json, setJson] = useState({});
   const [errorMsg, setErrorMsg] = useState("");
   const router = useRouter();
+
+  const organization = useOrganization();
+  const user = useUser();
+
+  
+  let orgId: string | undefined = undefined;
+  if (organization.isLoaded && user.isLoaded) {
+    orgId = organization.organization?.id ?? user.user?.id;
+  }
 
   async function getOrganizedData(category: string, text: string) {
     setTimeout(() => {
@@ -51,7 +70,6 @@ export function ExtractionStep({
     const res = await fetch("/api/data-extraction/save", {
       method: "PUT",
       body: JSON.stringify({
-        uuid,
         json,
         category: category.value,
       }),
@@ -61,6 +79,24 @@ export function ExtractionStep({
       throw new Error(data.message);
     }
   }
+
+  const createExtractions = useMutation(api.extractions.createStructuredData);
+
+  async function updateStructuredData() {
+    if (!orgId) return;
+
+    return await createExtractions({
+      category: category.value,
+      text,
+      status: Status.TO_VERIFY,
+      orgId,
+      json,
+    });
+
+
+  }
+
+  console.log(updateStructuredData());
 
   useEffect(() => {
     const extract = async () => {
@@ -163,7 +199,7 @@ export function ExtractionStep({
 
           {status === "complete" && (
             <Button
-              disabled={isUpdating}
+             
               className={cn("w-full")}
               onClick={() => {
                 setUpdating(true);

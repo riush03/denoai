@@ -1,5 +1,4 @@
-//use convex database
-import { Extraction } from "@prisma/client";
+
 import {
   FormControl,
   FormField,
@@ -16,11 +15,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { Doc } from "@/convex/_generated/dataModel";
+
 
 type ExtractionSelectProps = {
   form: any;
   name: string;
-  extractions: Extraction[];
+  extractions: Doc<"extractions">[];
 };
 
 export function ExtractionSelect({
@@ -48,8 +49,8 @@ export function ExtractionSelect({
               <SelectGroup>
                 <SelectLabel>Extractions</SelectLabel>
                 {extractions.map((extraction) => (
-                  <SelectItem key={extraction.id} value={extraction.id}>
-                    {extraction.id} - {extraction.filename}
+                  <SelectItem key={extraction._id} value={extraction._id}>
+                    {extraction._id} - {extraction.text}
                   </SelectItem>
                 ))}
               </SelectGroup>

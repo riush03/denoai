@@ -9,12 +9,12 @@ const pipelines: NavSectionItems = {
   items: [
     {
       label: "Text Recognition",
-      href: "/text-recognition",
+      href: "/textrecognition",
       icon: "textSelect",
     },
     {
       label: "Data Extraction",
-      href: "/data-extraction",
+      href: "/dataextraction",
       icon: "braces",
     },
     {

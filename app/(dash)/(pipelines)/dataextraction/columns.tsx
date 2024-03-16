@@ -11,10 +11,10 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
-import { formatRelative } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-
+import { Doc } from "@/convex/_generated/dataModel";
+import { formatRelative } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,29 +24,34 @@ import {
 import { cn } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal, RefreshCw, Trash } from "lucide-react";
-import { Doc } from "@/convex/_generated/dataModel";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+export type Extraction = {
+  id: string;
+  filename: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
 
-export const columns: ColumnDef<Doc<"extractions">>[] = [
+export const columns: ColumnDef<Doc<"files">>[]  = [
   {
-    accessorKey: "id",
+    accessorKey: "fileId",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID" />
     ),
     cell: ({ row }) => (
       <div
         className="w-36 2xl:w-full truncate overflow-hidden text-slate-900"
-        title={row.getValue("id")}
+        title={row.getValue("fileId")}
       >
-        {row.getValue("id")}
+        {row.original.fileId}
       </div>
     ),
     enableSorting: false,
   },
   {
-    accessorKey: "filename",
+    accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="File name" />
     ),
@@ -55,12 +60,12 @@ export const columns: ColumnDef<Doc<"extractions">>[] = [
         title={row.getValue("filename")}
         className="w-36 2xl:w-full 2xl:max-w-3xl truncate overflow-hidden text-slate-900"
       >
-        {row.getValue("filename")}
+        {row.original.category}
       </div>
     ),
   },
   {
-    accessorKey: "_creationTime",
+    accessorKey: "createdAt",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Creation Date" />
     ),
@@ -69,7 +74,8 @@ export const columns: ColumnDef<Doc<"extractions">>[] = [
          {formatRelative(new Date(row.original._creationTime), new Date())}
       </div>
     ),
-    },
+  },
+
   {
     id: "actions",
     cell: ({ table, row }) => {
@@ -90,7 +96,7 @@ export const columns: ColumnDef<Doc<"extractions">>[] = [
             <DropdownMenuContent align="end" className="w-[160px]">
               <DropdownMenuItem>
                 <Link
-                  href={`/verification/${row.original._id}`}
+                  href={`/text-recognition/${row.original.fileId}`}
                   className="flex items-center w-full"
                 >
                   <RefreshCw className="mr-2 h-3.5 w-3.5 text-slate-900/70" />
@@ -119,9 +125,7 @@ export const columns: ColumnDef<Doc<"extractions">>[] = [
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={async () => {
-                  router.refresh();
-                }}
+              
               >
                 Delete
               </AlertDialogAction>

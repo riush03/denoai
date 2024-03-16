@@ -6,11 +6,19 @@ export const fileTypes = v.union(
     v.literal("pdf")
   );
 
+export const fileCategories = v.union(
+    v.literal("invoice"),
+    v.literal("receipts"),
+    v.literal("card statement")
+  );
+
+
 export const roles = v.union(v.literal("admin"), v.literal("member"));
 
 export default defineSchema({
     files: defineTable({
-        name: v.string(),
+        category: v.string(),
+        status: v.number(),
         type: fileTypes,
         orgId: v.string(),
         fileId: v.id("_storage"),
@@ -35,12 +43,12 @@ export default defineSchema({
           })
         ),
       }).index("by_tokenIdentifier", ["tokenIdentifier"]),
-    documents: defineTable({
-        embedding: v.array(v.number()),
+    extractions: defineTable({
+        category: v.any(),
         text: v.string(),
-        metadata: v.any(),
-    }).vectorIndex("byEmbedding",{
-        vectorField: "embedding",
-        dimensions: 1536,
-    }),
+        status: v.number(),
+        orgId: v.string(),
+        userId: v.id("users"),
+        json: v.any(),
+    }).index("by_userId_orgId",["userId","orgId"]),
 });

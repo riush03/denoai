@@ -16,10 +16,12 @@ import type {
 } from "convex/server";
 import type * as clerk from "../clerk.js";
 import type * as constants_prompts from "../constants/prompts.js";
+import type * as extractions from "../extractions.js";
 import type * as files from "../files.js";
 import type * as http from "../http.js";
 import type * as langchain_db from "../langchain/db.js";
 import type * as lib_myllm from "../lib/myllm.js";
+import type * as serve from "../serve.js";
 import type * as users from "../users.js";
 
 /**
@@ -33,10 +35,12 @@ import type * as users from "../users.js";
 declare const fullApi: ApiFromModules<{
   clerk: typeof clerk;
   "constants/prompts": typeof constants_prompts;
+  extractions: typeof extractions;
   files: typeof files;
   http: typeof http;
   "langchain/db": typeof langchain_db;
   "lib/myllm": typeof lib_myllm;
+  serve: typeof serve;
   users: typeof users;
 }>;
 export declare const api: FilterApi<

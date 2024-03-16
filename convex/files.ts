@@ -8,6 +8,7 @@ import {
 } from "./_generated/server";
 import { getUser } from "./users";
 import { fileTypes } from "./schema";
+import { fileCategories } from "./schema";
 import { Doc, Id } from "./_generated/dataModel";
 
 export const generateUploadUrl = mutation(async (ctx) => {
@@ -30,6 +31,7 @@ export async function hasAccessToOrg(
     return null;
   }
 
+
   const user = await ctx.db
     .query("users")
     .withIndex("by_tokenIdentifier", (q) =>
@@ -45,6 +47,9 @@ export async function hasAccessToOrg(
     user.orgIds.some((item) => item.orgId === orgId) ||
     user.tokenIdentifier.includes(orgId);
 
+  console.log(user.orgIds);
+  console.log(user.tokenIdentifier,identity.tokenIdentifier)
+
   if (!hasAccess) {
     return null;
   }
@@ -54,20 +59,25 @@ export async function hasAccessToOrg(
 
 export const createFile = mutation({
   args: {
-    name: v.string(),
+    category: v.string(),
+    status: v.number(),
     fileId: v.id("_storage"),
     orgId: v.string(),
     type: fileTypes,
   },
   async handler(ctx, args) {
+    const identity = await ctx.auth.getUserIdentity();
     const hasAccess = await hasAccessToOrg(ctx, args.orgId);
+
+    console.log(hasAccess);
 
     if (!hasAccess) {
       throw new ConvexError("you do not have access to this org");
     }
 
     await ctx.db.insert("files", {
-      name: args.name,
+      category: args.category,
+      status: args.status,
       orgId: args.orgId,
       fileId: args.fileId,
       type: args.type,
@@ -75,6 +85,8 @@ export const createFile = mutation({
     });
   },
 });
+
+
 
 export const getFiles = query({
   args: {
@@ -100,7 +112,7 @@ export const getFiles = query({
 
     if (query) {
       files = files.filter((file) =>
-        file.name.toLowerCase().includes(query.toLowerCase())
+        file.category.toLowerCase().includes(query.toLowerCase())
       );
     }
 
@@ -130,6 +142,23 @@ export const getFiles = query({
     return files;
   },
 });
+
+export const getFileUrl = query({
+  args: {},
+  handler: async (ctx) => {
+    const messages = await ctx.db.query("files").collect();
+    return Promise.all(
+      messages.map(async (message) => ({
+        ...message,
+        // If the message is an "image" its `body` is an `Id<"_storage">`
+        ...(message.type === "pdf"
+          ? { url: await ctx.storage.getUrl(message.fileId) }
+          : {}),
+      })),
+    );
+  },
+});
+
 
 export const deleteAllFiles = internalMutation({
   args: {},
@@ -191,6 +220,8 @@ export const restoreFile = mutation({
     });
   },
 });
+
+
 
 export const toggleFavorite = mutation({
   args: { fileId: v.id("files") },

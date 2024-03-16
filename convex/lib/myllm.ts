@@ -5,6 +5,7 @@ import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { CheerioWebBaseLoader } from "langchain/document_loaders/web/cheerio";
 import { CacheBackedEmbeddings } from "langchain/embeddings/cache_backed";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf"
 import { ChainValues } from 'langchain/dist/schema';
 import { LLMChain, loadQARefineChain } from 'langchain/chains';
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
@@ -30,7 +31,7 @@ export const ingest = action({
 })
 
 //data splitting
-export const fetchAndEmbedSingle = internalAction({
+ const fetchAndEmbedSingle = internalAction({
     args: {
       url: v.string(),
     },
@@ -78,8 +79,11 @@ function extract(){
 
   try{
     const output = llmChain.call(chainValues);
-    return {output};
+    const response = JSON.stringify(output);
+    return {response};
   } catch(e){
     throw e;
   }
  }
+
+

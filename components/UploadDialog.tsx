@@ -12,7 +12,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   Dialog,
   DialogContent,
@@ -21,15 +21,29 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Icons } from "./Icons";
 import { api } from "../convex/_generated/api";
-import { z } from "zod";
+import { array, z } from "zod";
 import { Doc } from "@/convex/_generated/dataModel";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+
+enum Status {
+  TO_RECOGNIZE,
+  TO_EXTRACT,
+  TO_VERIFY,
+}
+
 
 
 const formSchema = z.object({
@@ -56,6 +70,12 @@ export function FileUploadDialog() {
 
   const fileRef = form.register("file");
 
+  let orgId: string | undefined = undefined;
+  if (organization.isLoaded && user.isLoaded) {
+    orgId = organization.organization?.id ?? user.user?.id;
+  }
+  console.log(orgId)
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!orgId) return;
 
@@ -77,7 +97,8 @@ export function FileUploadDialog() {
 
     try {
       await createFile({
-        name: values.title,
+        category: values.title,
+        status: Status.TO_EXTRACT,
         fileId: storageId,
         orgId,
         type: types[fileType],
@@ -100,14 +121,12 @@ export function FileUploadDialog() {
     }
   }
    
-  let orgId: string | undefined = undefined;
-  if (organization.isLoaded && user.isLoaded) {
-    orgId = organization.organization?.id ?? user.user?.id;
-  }
+ 
 
   const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
 
-   const createFile = useMutation(api.files.createFile);
+  const files = useQuery(api.files.getFiles, orgId ? { orgId}:"skip");
+  const createFile = useMutation(api.files.createFile);
    
   return (
     <Dialog
@@ -156,6 +175,7 @@ export function FileUploadDialog() {
                   </FormItem>
                 )}
               />
+
 
               <FormField
                 control={form.control}
